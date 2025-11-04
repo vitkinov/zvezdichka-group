@@ -3,8 +3,7 @@
 // It lists all .md files found in public/recipes/
 
 export const recipeFiles = [
-  "example-recipe.md",
-  "здравословен-салата-обяд.md"
+  "бъркана-зелена-баница.md"
 ];
 
 export default recipeFiles;

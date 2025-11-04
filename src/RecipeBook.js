@@ -148,6 +148,18 @@ function RecipeBook() {
     }
   };
 
+  const stripMarkdown = (text) => {
+    if (!text) return '';
+    // Remove markdown formatting
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '$1') // Bold **text**
+      .replace(/\*(.*?)\*/g, '$1') // Italic *text*
+      .replace(/##+ /g, '') // Headings ##
+      .replace(/`(.*?)`/g, '$1') // Inline code `code`
+      .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1') // Links [text](url)
+      .trim();
+  };
+
   const renderRecipeContent = (content) => {
     const lines = content.split('\n');
     const elements = [];
@@ -362,7 +374,8 @@ function RecipeBook() {
                                  !trimmed.match(/^\d+\./);
                         });
                         const preview = firstLine ? firstLine.trim() : recipe.content.trim();
-                        const displayText = preview.length > 150 ? preview.substring(0, 150) + '...' : preview;
+                        const strippedPreview = stripMarkdown(preview);
+                        const displayText = strippedPreview.length > 150 ? strippedPreview.substring(0, 150) + '...' : strippedPreview;
                         return (
                           <p className="recipe-preview-text">{displayText}</p>
                         );
