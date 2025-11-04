@@ -1,11 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, MapPin } from 'lucide-react';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { Calendar as CalendarIcon, Clock, MapPin, BookOpen } from 'lucide-react';
 import { eventsData } from './data';
+import RecipeBook from './RecipeBook';
+import RecipeDetail from './RecipeDetail';
 import './App.css';
 
 function App() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [error, setError] = useState('');
+  
+  // Determine active tab based on route
+  const activeTab = location.pathname.startsWith('/recipes') ? 'recipes' : 'calendar';
+  
+  const handleTabChange = (tab) => {
+    if (tab === 'calendar') {
+      navigate('/');
+    } else if (tab === 'recipes') {
+      navigate('/recipes');
+    }
+  };
 
   useEffect(() => {
     fetchEvents();
@@ -127,85 +143,108 @@ function App() {
     <div className="app">
       <div className="container">
         <header className="header">
-          <h1>🌟 Календар</h1>
-          <p>Гледайте събитията от календара на детската група</p>
+          <h1>🌟 Звездичка Група</h1>
+          <p>Календар със събития и книга със здравословни рецепти</p>
         </header>
 
+        <nav className="nav-tabs">
+          <button
+            className={`nav-tab ${activeTab === 'calendar' ? 'active' : ''}`}
+            onClick={() => handleTabChange('calendar')}
+          >
+            <CalendarIcon size={20} />
+            Календар
+          </button>
+          <button
+            className={`nav-tab ${activeTab === 'recipes' ? 'active' : ''}`}
+            onClick={() => handleTabChange('recipes')}
+          >
+            <BookOpen size={20} />
+            Рецепти
+          </button>
+        </nav>
 
-        {error && (
-          <div className="error">
-            <strong>Error:</strong> {error}
-          </div>
-        )}
+        <Routes>
+          <Route path="/" element={
+            <>
+              {error && (
+                <div className="error">
+                  <strong>Error:</strong> {error}
+                </div>
+              )}
 
-
-        {events.length > 0 && (
-          <div className="events-container">
-            <div className="events-header">
-              <h2 className="events-title">📅 Предстоящи събития</h2>
-              <span className="events-count">
-                {events.length} събити{events.length === 1 ? 'е' : events.length > 1 ? 'я' : 'я'}
-              </span>
-            </div>
-
-            <div className="events-grid">
-              {events.map((event) => {
-                const eventTime = formatEventTime(event);
-                return (
-                  <div key={event.id} className="event-card">
-                    <h3 className="event-title">{event.summary}</h3>
-                    <div className="event-time">
-                      <Clock size={16} />
-                      <div className="event-time-content">
-                        {eventTime.single ? (
-                          <span>{eventTime.single}</span>
-                        ) : (
-                          <div className="event-time-range">
-                            {eventTime.date && (
-                              <div className="event-date">{eventTime.date}</div>
-                            )}
-                            <div className="event-start">{eventTime.start}</div>
-                            <div className="event-end">{eventTime.end}</div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    {event.description && (
-                      <div className="event-description">
-                        {event.description.split('\n').map((line, index) => (
-                          <p key={index}>
-                            {line.split(/(\*\*.*?\*\*)/).map((part, partIndex) => {
-                              if (part.startsWith('**') && part.endsWith('**')) {
-                                // Remove the ** markers and make bold
-                                const boldText = part.slice(2, -2);
-                                return <strong key={partIndex}>{boldText}</strong>;
-                              }
-                              return <span key={partIndex}>{part}</span>;
-                            })}
-                          </p>
-                        ))}
-                      </div>
-                    )}
-                    {event.location && (
-                      <div className="event-location">
-                        <MapPin size={16} />
-                        <span>{event.location}</span>
-                      </div>
-                    )}
+              {events.length > 0 && (
+                <div className="events-container">
+                  <div className="events-header">
+                    <h2 className="events-title">📅 Предстоящи събития</h2>
+                    <span className="events-count">
+                      {events.length} събити{events.length === 1 ? 'е' : events.length > 1 ? 'я' : 'я'}
+                    </span>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
 
-        {events.length === 0 && !error && (
-          <div className="no-events">
-            <div className="no-events-icon">📅</div>
-            <h3>Няма намерени събития</h3>
-            <p>В момента няма събития за показване.</p>
-          </div>
-        )}
+                  <div className="events-grid">
+                    {events.map((event) => {
+                      const eventTime = formatEventTime(event);
+                      return (
+                        <div key={event.id} className="event-card">
+                          <h3 className="event-title">{event.summary}</h3>
+                          <div className="event-time">
+                            <Clock size={16} />
+                            <div className="event-time-content">
+                              {eventTime.single ? (
+                                <span>{eventTime.single}</span>
+                              ) : (
+                                <div className="event-time-range">
+                                  {eventTime.date && (
+                                    <div className="event-date">{eventTime.date}</div>
+                                  )}
+                                  <div className="event-start">{eventTime.start}</div>
+                                  <div className="event-end">{eventTime.end}</div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          {event.description && (
+                            <div className="event-description">
+                              {event.description.split('\n').map((line, index) => (
+                                <p key={index}>
+                                  {line.split(/(\*\*.*?\*\*)/).map((part, partIndex) => {
+                                    if (part.startsWith('**') && part.endsWith('**')) {
+                                      // Remove the ** markers and make bold
+                                      const boldText = part.slice(2, -2);
+                                      return <strong key={partIndex}>{boldText}</strong>;
+                                    }
+                                    return <span key={partIndex}>{part}</span>;
+                                  })}
+                                </p>
+                              ))}
+                            </div>
+                          )}
+                          {event.location && (
+                            <div className="event-location">
+                              <MapPin size={16} />
+                              <span>{event.location}</span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {events.length === 0 && !error && (
+                <div className="no-events">
+                  <div className="no-events-icon">📅</div>
+                  <h3>Няма намерени събития</h3>
+                  <p>В момента няма събития за показване.</p>
+                </div>
+              )}
+            </>
+          } />
+          <Route path="/recipes" element={<RecipeBook />} />
+          <Route path="/recipes/:filename" element={<RecipeDetail />} />
+        </Routes>
       </div>
     </div>
   );

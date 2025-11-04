@@ -4,18 +4,24 @@
   "description": "A responsive React app to display Calendar events with a child-friendly theme",
   "main": "index.js",
   "scripts": {
+    "discover-recipes": "node scripts/discover-recipes.js",
+    "prestart": "npm run discover-recipes",
+    "prebuild": "npm run discover-recipes",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "dependencies": {
+    "date-fns": "^2.30.0",
+    "googleapis": "^128.0.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.3",
+    "lucide-react": "^0.294.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
-    "googleapis": "^128.0.0",
-    "date-fns": "^2.30.0",
-    "lucide-react": "^0.294.0"
+    "react-router-dom": "^7.9.5",
+    "react-scripts": "5.0.1"
   },
   "browserslist": {
     "production": [
@@ -30,4 +36,3 @@
     ]
   }
 }
-
