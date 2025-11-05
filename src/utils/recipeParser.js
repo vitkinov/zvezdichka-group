@@ -47,7 +47,7 @@ export function parseRecipeMarkdown(markdown) {
     title: metadata.title || '',
     mealType: metadata.mealType || 'breakfast',
     author: metadata.author || '',
-    photo: metadata.photo || '',
+    photo: metadata.photo || metadata.image || '',
     content: content
   };
 }

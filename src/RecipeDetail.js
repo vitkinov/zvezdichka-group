@@ -4,6 +4,7 @@ import { ArrowLeft, User, UtensilsCrossed, FileDown } from 'lucide-react';
 import { parseRecipeMarkdown } from './utils/recipeParser';
 import { generateRecipePDF } from './utils/pdfGenerator';
 import { getMealTypeLabel } from './utils/mealTypes';
+import { getRecipeImage } from './utils/recipeImage';
 import './RecipeDetail.css';
 
 const RECIPES_DIR = '/recipes';
@@ -209,12 +210,6 @@ function RecipeDetail() {
       </div>
 
       <article className="recipe-detail-content">
-        {recipe.photo && (
-          <div className="recipe-detail-photo">
-            <img src={recipe.photo} alt={recipe.title} />
-          </div>
-        )}
-
         <header className="recipe-detail-title-section">
           <h1 className="recipe-detail-title">{recipe.title}</h1>
           <div className="recipe-detail-meta">
@@ -228,6 +223,12 @@ function RecipeDetail() {
             </span>
           </div>
         </header>
+
+        {recipe.photo && (
+          <div className="recipe-detail-photo">
+            <img src={getRecipeImage(recipe.photo, recipe.title)} alt={recipe.title} />
+          </div>
+        )}
 
         <div className="recipe-detail-text">
           {renderRecipeContent(recipe.content)}

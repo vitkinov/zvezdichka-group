@@ -5,6 +5,7 @@ import { parseRecipeMarkdown, generateRecipeMarkdown, generateRecipeFilename, do
 import { generateRecipePDF, generateAllRecipesPDF } from './utils/pdfGenerator';
 import { recipeFiles } from './recipes/discovered';
 import { getMealTypesFromRecipes, getMealTypeLabel, getDefaultMealTypes } from './utils/mealTypes';
+import { getRecipeImage } from './utils/recipeImage';
 import './RecipeBook.css';
 
 const RECIPES_DIR = '/recipes';
@@ -341,11 +342,9 @@ function RecipeBook() {
                 className="recipe-card-link"
               >
                 <div className="recipe-card">
-                  {recipe.photo && (
-                    <div className="recipe-photo">
-                      <img src={recipe.photo} alt={recipe.title} />
-                    </div>
-                  )}
+                  <div className="recipe-photo">
+                    <img src={getRecipeImage(recipe.photo, recipe.title)} alt={recipe.title} />
+                  </div>
                   <div className="recipe-content">
                     <div className="recipe-header">
                       <h3 className="recipe-title">{recipe.title}</h3>

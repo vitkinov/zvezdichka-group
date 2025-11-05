@@ -1,5 +1,6 @@
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
+import { getRecipeImage } from './recipeImage';
 
 /**
  * Create HTML content for a recipe
@@ -54,6 +55,8 @@ function createRecipeHTML(recipe, mealTypeLabel) {
     htmlContent += `<p style="margin: 6px 0; line-height: 1.6; page-break-inside: avoid; orphans: 2; widows: 2; page-break-before: auto;">${processedLine}</p>`;
   });
 
+  const recipeImage = getRecipeImage(recipe.photo, recipe.title);
+  
   return `
     <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif; padding: 20px; color: #333; background: white; width: 794px; box-sizing: border-box;">
       <div style="display: flex; align-items: flex-start; margin-bottom: 16px; gap: 20px;">
@@ -64,6 +67,9 @@ function createRecipeHTML(recipe, mealTypeLabel) {
       <div style="margin-bottom: 20px; color: #666; font-size: 12px;">
         <p style="margin: 4px 0;">Тип: ${mealTypeLabel}</p>
         <p style="margin: 4px 0;">Автор: ${recipe.author}</p>
+      </div>
+      <div style="margin-bottom: 20px; width: 100%; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <img src="${recipeImage}" alt="${recipe.title}" style="width: 100%; height: auto; display: block;" />
       </div>
       <div style="margin-top: 20px;">
         ${htmlContent}
@@ -119,6 +125,8 @@ function createSingleRecipeHTML(recipe, mealTypeLabel) {
     htmlContent += `<p style="margin: 6px 0; line-height: 1.6; page-break-inside: avoid; orphans: 2; widows: 2;">${processedLine}</p>`;
   });
 
+  const recipeImage = getRecipeImage(recipe.photo, recipe.title);
+  
   return `
     <div style="padding: 20px; color: #333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif; background: white; width: 794px; box-sizing: border-box;">
       <div style="display: flex; align-items: flex-start; margin-bottom: 16px; gap: 20px;">
@@ -129,6 +137,9 @@ function createSingleRecipeHTML(recipe, mealTypeLabel) {
       <div style="margin-bottom: 20px; color: #666; font-size: 11px;">
         <p style="margin: 4px 0;">Тип: ${mealTypeLabel}</p>
         <p style="margin: 4px 0;">Автор: ${recipe.author}</p>
+      </div>
+      <div style="margin-bottom: 20px; width: 100%; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <img src="${recipeImage}" alt="${recipe.title}" style="width: 100%; height: auto; display: block;" />
       </div>
       <div style="margin-top: 20px;">
         ${htmlContent}
