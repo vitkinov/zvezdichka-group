@@ -58,7 +58,7 @@ function createRecipeHTML(recipe, mealTypeLabel) {
   const recipeImage = getRecipeImage(recipe.photo, recipe.title);
   
   return `
-    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif; padding: 40px; color: #333; background: white; width: 700px; box-sizing: border-box;">
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif; padding: 40px; color: #333; background: white; width: 450px; box-sizing: border-box;">
       <div style="display: flex; align-items: flex-start; margin-bottom: 16px; gap: 20px;">
         <div style="flex: 1; min-width: 0;">
           <h1 style="font-size: 24px; font-weight: bold; margin: 0; color: #2c3e50; word-wrap: break-word; overflow-wrap: break-word; line-height: 1.3;">${recipe.title}</h1>
@@ -128,7 +128,7 @@ function createSingleRecipeHTML(recipe, mealTypeLabel) {
   const recipeImage = getRecipeImage(recipe.photo, recipe.title);
   
   return `
-    <div style="padding: 40px; color: #333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif; background: white; width: 700px; box-sizing: border-box;">
+    <div style="padding: 40px; color: #333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif; background: white; width: 450px; box-sizing: border-box;">
       <div style="display: flex; align-items: flex-start; margin-bottom: 16px; gap: 20px;">
         <div style="flex: 1; min-width: 0;">
           <h1 style="font-size: 22px; font-weight: bold; margin: 0; color: #2c3e50; word-wrap: break-word; overflow-wrap: break-word; line-height: 1.3;">${recipe.title}</h1>
@@ -153,7 +153,7 @@ function createSingleRecipeHTML(recipe, mealTypeLabel) {
  */
 function createChapterHTML(mealTypeLabel) {
   return `
-    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif; padding: 40px; color: #333; background: white; width: 700px; box-sizing: border-box; min-height: 1043px; display: flex; align-items: center; justify-content: center;">
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif; padding: 40px; color: #333; background: white; width: 450px; box-sizing: border-box; min-height: 714px; display: flex; align-items: center; justify-content: center;">
       <h1 style="font-size: 32px; font-weight: bold; margin: 0; color: #2c3e50; text-align: center; border-bottom: 3px solid #3498db; padding-bottom: 15px;">${mealTypeLabel}</h1>
     </div>
   `;
@@ -164,7 +164,7 @@ function createChapterHTML(mealTypeLabel) {
  */
 function createTitlePageHTML() {
   return `
-    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif; padding: 40px; color: #333; background: white; width: 700px; box-sizing: border-box; min-height: 1043px; display: flex; align-items: center; justify-content: center;">
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif; padding: 40px; color: #333; background: white; width: 450px; box-sizing: border-box; min-height: 714px; display: flex; align-items: center; justify-content: center;">
       <div style="text-align: center;">
         <h1 style="font-size: 36px; font-weight: bold; margin: 0; color: #2c3e50;">Книга със здравословни рецепти</h1>
         <h2 style="font-size: 18px; font-weight: normal; margin: 16px 0 0 0; color: #888;">на група "Звездичка" към ДГ "Слънчев дом"</h2>
@@ -200,7 +200,7 @@ function createTOCHTML(recipePageMap, mealTypes) {
   });
 
   return `
-    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif; padding: 40px; color: #333; background: white; width: 700px; box-sizing: border-box;">
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif; padding: 40px; color: #333; background: white; width: 450px; box-sizing: border-box;">
       <h2 style="font-size: 18px; font-weight: bold; margin: 20px 0 10px 0;">Съдържание</h2>
       ${tocHTML}
     </div>
@@ -227,7 +227,7 @@ function splitContentIntoPages(div, pageHeightPx) {
   const allElements = Array.from(clone.querySelectorAll('p, h1, h2, h3, h4, h5, h6'));
   
   let currentPage = document.createElement('div');
-  currentPage.style.width = '700px';
+  currentPage.style.width = '450px';
   currentPage.style.background = 'white';
   currentPage.style.padding = '40px';
   currentPage.style.boxSizing = 'border-box';
@@ -289,7 +289,7 @@ function splitContentIntoPages(div, pageHeightPx) {
       
       // Start new page
       currentPage = document.createElement('div');
-      currentPage.style.width = '700px';
+      currentPage.style.width = '450px';
       currentPage.style.background = 'white';
       currentPage.style.padding = '40px';
       currentPage.style.boxSizing = 'border-box';
@@ -350,8 +350,8 @@ export async function generateRecipePDF(recipe, mealTypeLabel) {
   tempDiv.style.position = 'fixed';
   tempDiv.style.top = '0';
   tempDiv.style.left = '0';
-  tempDiv.style.width = '700px';
-  tempDiv.style.maxWidth = '700px';
+  tempDiv.style.width = '450px';
+  tempDiv.style.maxWidth = '450px';
   tempDiv.style.background = 'white';
   tempDiv.style.zIndex = '-1';
   document.body.appendChild(tempDiv);
@@ -361,16 +361,16 @@ export async function generateRecipePDF(recipe, mealTypeLabel) {
     await waitForImages(tempDiv);
     await new Promise(resolve => setTimeout(resolve, 200));
     
-    // Calculate page height in pixels (A4 at 96 DPI)
-    const pageHeightPx = 1123; // 297mm at 96 DPI
+    // Calculate page height in pixels (A5 at 96 DPI)
+    const pageHeightPx = 794; // 210mm at 96 DPI
     
     // Split content into pages with smart breaks
     const pages = splitContentIntoPages(tempDiv, pageHeightPx);
     
-  const doc = new jsPDF('p', 'mm', 'a4');
+  const doc = new jsPDF('p', 'mm', 'a5');
   const margin = 15; // 15mm margin on all sides
-  const contentWidth = 210 - (margin * 2); // A4 width minus margins
-  const pageHeight = 297; // A4 height in mm
+  const contentWidth = 148 - (margin * 2); // A5 width minus margins (148mm)
+  const pageHeight = 210; // A5 height in mm
     
     for (let i = 0; i < pages.length; i++) {
       if (i > 0) {
@@ -394,9 +394,9 @@ export async function generateRecipePDF(recipe, mealTypeLabel) {
           useCORS: true,
           logging: false,
           backgroundColor: '#ffffff',
-          width: 700,
+          width: 450,
           height: pageDiv.scrollHeight,
-          windowWidth: 700,
+          windowWidth: 450,
           windowHeight: pageDiv.scrollHeight,
           letterRendering: true,
           allowTaint: false,
@@ -449,9 +449,9 @@ function addPageToPDF(doc, pageDiv, imgWidth, pageHeightPx) {
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
-        width: 700,
+        width: 450,
         height: pageDiv.scrollHeight,
-        windowWidth: 700,
+        windowWidth: 450,
         windowHeight: pageDiv.scrollHeight,
         letterRendering: true,
         allowTaint: false,
@@ -469,7 +469,7 @@ function addPageToPDF(doc, pageDiv, imgWidth, pageHeightPx) {
       // Use PNG for best text quality (lossless, better for text rendering)
       const imgData = canvas.toDataURL('image/png');
       const margin = 15; // 15mm margin on all sides
-      const contentWidth = 210 - (margin * 2); // A4 width minus margins
+      const contentWidth = 148 - (margin * 2); // A5 width minus margins (148mm)
       const imgHeight = (canvas.height * contentWidth) / canvas.width;
       doc.addImage(imgData, 'PNG', margin, margin, contentWidth, imgHeight, undefined, 'FAST');
       
@@ -488,10 +488,10 @@ export async function generateAllRecipesPDF(recipes, mealTypes) {
   await waitForFonts();
   
   const margin = 15; // 15mm margin on all sides
-  const contentWidth = 210 - (margin * 2); // A4 width minus margins
-  const contentWidthPx = 700; // Content width in pixels
-  const pageHeight = 297;
-  const pageHeightPx = 1123; // 297mm at 96 DPI
+  const contentWidth = 148 - (margin * 2); // A5 width minus margins (148mm)
+  const contentWidthPx = 450; // Content width in pixels (A5: ~118mm = ~450px at 96 DPI)
+  const pageHeight = 210; // A5 height in mm
+  const pageHeightPx = 794; // 210mm at 96 DPI
 
   // Group recipes by mealType
   const recipesByMealType = {};
@@ -523,8 +523,8 @@ export async function generateAllRecipesPDF(recipes, mealTypes) {
     chapterDiv.style.position = 'fixed';
     chapterDiv.style.top = '0';
     chapterDiv.style.left = '0';
-    chapterDiv.style.width = '700px';
-    chapterDiv.style.maxWidth = '700px';
+    chapterDiv.style.width = '450px';
+    chapterDiv.style.maxWidth = '450px';
     chapterDiv.style.background = 'white';
     chapterDiv.style.zIndex = '-1';
     document.body.appendChild(chapterDiv);
@@ -550,9 +550,9 @@ export async function generateAllRecipesPDF(recipes, mealTypes) {
             useCORS: true,
             logging: false,
             backgroundColor: '#ffffff',
-            width: 700,
+            width: 450,
             height: pageDiv.scrollHeight,
-            windowWidth: 700,
+            windowWidth: 450,
             windowHeight: pageDiv.scrollHeight,
             letterRendering: true,
             allowTaint: false,
@@ -589,8 +589,8 @@ export async function generateAllRecipesPDF(recipes, mealTypes) {
       recipeDiv.style.position = 'fixed';
       recipeDiv.style.top = '0';
       recipeDiv.style.left = '0';
-      recipeDiv.style.width = '700px';
-      recipeDiv.style.maxWidth = '700px';
+      recipeDiv.style.width = '450px';
+      recipeDiv.style.maxWidth = '450px';
       recipeDiv.style.background = 'white';
       recipeDiv.style.zIndex = '-1';
       document.body.appendChild(recipeDiv);
@@ -621,9 +621,9 @@ export async function generateAllRecipesPDF(recipes, mealTypes) {
               useCORS: true,
               logging: false,
               backgroundColor: '#ffffff',
-              width: 700,
+              width: 450,
               height: pageDiv.scrollHeight,
-              windowWidth: 700,
+              windowWidth: 450,
               windowHeight: pageDiv.scrollHeight,
               letterRendering: true,
               allowTaint: false,
@@ -666,8 +666,8 @@ export async function generateAllRecipesPDF(recipes, mealTypes) {
   tocDiv.style.position = 'fixed';
   tocDiv.style.top = '0';
   tocDiv.style.left = '0';
-  tocDiv.style.width = '700px';
-  tocDiv.style.maxWidth = '700px';
+  tocDiv.style.width = '450px';
+  tocDiv.style.maxWidth = '450px';
   tocDiv.style.background = 'white';
   tocDiv.style.zIndex = '-1';
   document.body.appendChild(tocDiv);
@@ -691,7 +691,7 @@ export async function generateAllRecipesPDF(recipes, mealTypes) {
     const correctedTocPages = splitContentIntoPages(tocDiv, pageHeightPx);
     
     // Build final PDF: Title page first, then TOC, then content
-    const doc = new jsPDF('p', 'mm', 'a4');
+    const doc = new jsPDF('p', 'mm', 'a5');
     
     // Add title page
     const titleHTML = createTitlePageHTML();
@@ -700,8 +700,8 @@ export async function generateAllRecipesPDF(recipes, mealTypes) {
     titleDiv.style.position = 'fixed';
     titleDiv.style.top = '0';
     titleDiv.style.left = '0';
-    titleDiv.style.width = '700px';
-    titleDiv.style.maxWidth = '700px';
+    titleDiv.style.width = '450px';
+    titleDiv.style.maxWidth = '450px';
     titleDiv.style.background = 'white';
     titleDiv.style.zIndex = '-1';
     document.body.appendChild(titleDiv);
