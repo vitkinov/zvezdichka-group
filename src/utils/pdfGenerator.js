@@ -58,7 +58,7 @@ function createRecipeHTML(recipe, mealTypeLabel) {
   const recipeImage = getRecipeImage(recipe.photo, recipe.title);
   
   return `
-    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif; padding: 20px; color: #333; background: white; width: 794px; box-sizing: border-box;">
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif; padding: 40px; color: #333; background: white; width: 700px; box-sizing: border-box;">
       <div style="display: flex; align-items: flex-start; margin-bottom: 16px; gap: 20px;">
         <div style="flex: 1; min-width: 0;">
           <h1 style="font-size: 24px; font-weight: bold; margin: 0; color: #2c3e50; word-wrap: break-word; overflow-wrap: break-word; line-height: 1.3;">${recipe.title}</h1>
@@ -128,7 +128,7 @@ function createSingleRecipeHTML(recipe, mealTypeLabel) {
   const recipeImage = getRecipeImage(recipe.photo, recipe.title);
   
   return `
-    <div style="padding: 20px; color: #333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif; background: white; width: 794px; box-sizing: border-box;">
+    <div style="padding: 40px; color: #333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif; background: white; width: 700px; box-sizing: border-box;">
       <div style="display: flex; align-items: flex-start; margin-bottom: 16px; gap: 20px;">
         <div style="flex: 1; min-width: 0;">
           <h1 style="font-size: 22px; font-weight: bold; margin: 0; color: #2c3e50; word-wrap: break-word; overflow-wrap: break-word; line-height: 1.3;">${recipe.title}</h1>
@@ -149,19 +149,57 @@ function createSingleRecipeHTML(recipe, mealTypeLabel) {
 }
 
 /**
- * Create HTML content for table of contents
+ * Create HTML content for chapter header (mealType)
  */
-function createTOCHTML(recipes, mealTypes) {
+function createChapterHTML(mealTypeLabel) {
+  return `
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif; padding: 40px; color: #333; background: white; width: 700px; box-sizing: border-box; min-height: 1043px; display: flex; align-items: center; justify-content: center;">
+      <h1 style="font-size: 32px; font-weight: bold; margin: 0; color: #2c3e50; text-align: center; border-bottom: 3px solid #3498db; padding-bottom: 15px;">${mealTypeLabel}</h1>
+    </div>
+  `;
+}
+
+/**
+ * Create HTML content for title page
+ */
+function createTitlePageHTML() {
+  return `
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif; padding: 40px; color: #333; background: white; width: 700px; box-sizing: border-box; min-height: 1043px; display: flex; align-items: center; justify-content: center;">
+      <div style="text-align: center;">
+        <h1 style="font-size: 36px; font-weight: bold; margin: 0; color: #2c3e50;">Книга със здравословни рецепти</h1>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Create HTML content for table of contents with page numbers
+ */
+function createTOCHTML(recipePageMap, mealTypes) {
   let tocHTML = '';
-  recipes.forEach((recipe, index) => {
+  let currentMealType = null;
+  
+  // Group by mealType in TOC
+  recipePageMap.forEach(({ recipe, pageNumber }) => {
     const mealTypeLabel = mealTypes.find(mt => mt.value === recipe.mealType)?.label || recipe.mealType;
-    tocHTML += `<p style="margin: 6px 0; padding-left: 10px; font-size: 12px;">${index + 1}. ${recipe.title} - ${mealTypeLabel}</p>`;
+    
+    // Add mealType header if it's a new mealType
+    if (currentMealType !== recipe.mealType) {
+      if (currentMealType !== null) {
+        tocHTML += '<div style="margin: 15px 0;"></div>'; // Spacing between mealType groups
+      }
+      tocHTML += `<h3 style="font-size: 16px; font-weight: bold; margin: 20px 0 8px 0; color: #3498db; padding-top: 10px; border-top: 1px solid #e0e0e0;">${mealTypeLabel}</h3>`;
+      currentMealType = recipe.mealType;
+    }
+    
+    tocHTML += `<p style="margin: 4px 0; padding-left: 20px; font-size: 12px; display: flex; justify-content: space-between;">
+      <span>${recipe.title}</span>
+      <span style="color: #666; font-weight: normal;">стр. ${pageNumber}</span>
+    </p>`;
   });
 
   return `
-    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif; padding: 20px; color: #333; background: white; width: 794px; box-sizing: border-box;">
-      <h1 style="font-size: 28px; font-weight: bold; margin-bottom: 20px; color: #2c3e50; text-align: center;">Книга със здравословни рецепти</h1>
-      <p style="margin-bottom: 20px; color: #666; text-align: center;">Общо рецепти: ${recipes.length}</p>
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif; padding: 40px; color: #333; background: white; width: 700px; box-sizing: border-box;">
       <h2 style="font-size: 18px; font-weight: bold; margin: 20px 0 10px 0;">Съдържание</h2>
       ${tocHTML}
     </div>
@@ -188,9 +226,9 @@ function splitContentIntoPages(div, pageHeightPx) {
   const allElements = Array.from(clone.querySelectorAll('p, h1, h2, h3, h4, h5, h6'));
   
   let currentPage = document.createElement('div');
-  currentPage.style.width = '794px';
+  currentPage.style.width = '700px';
   currentPage.style.background = 'white';
-  currentPage.style.padding = '20px';
+  currentPage.style.padding = '40px';
   currentPage.style.boxSizing = 'border-box';
   currentPage.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif";
   let currentHeight = 40; // Start with padding
@@ -250,9 +288,9 @@ function splitContentIntoPages(div, pageHeightPx) {
       
       // Start new page
       currentPage = document.createElement('div');
-      currentPage.style.width = '794px';
+      currentPage.style.width = '700px';
       currentPage.style.background = 'white';
-      currentPage.style.padding = '20px';
+      currentPage.style.padding = '40px';
       currentPage.style.boxSizing = 'border-box';
       currentPage.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif";
       currentHeight = 40; // Reset with padding
@@ -311,8 +349,8 @@ export async function generateRecipePDF(recipe, mealTypeLabel) {
   tempDiv.style.position = 'fixed';
   tempDiv.style.top = '0';
   tempDiv.style.left = '0';
-  tempDiv.style.width = '794px';
-  tempDiv.style.maxWidth = '794px';
+  tempDiv.style.width = '700px';
+  tempDiv.style.maxWidth = '700px';
   tempDiv.style.background = 'white';
   tempDiv.style.zIndex = '-1';
   document.body.appendChild(tempDiv);
@@ -328,9 +366,10 @@ export async function generateRecipePDF(recipe, mealTypeLabel) {
     // Split content into pages with smart breaks
     const pages = splitContentIntoPages(tempDiv, pageHeightPx);
     
-    const doc = new jsPDF('p', 'mm', 'a4');
-    const imgWidth = 210; // A4 width in mm
-    const pageHeight = 297; // A4 height in mm
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const margin = 15; // 15mm margin on all sides
+  const contentWidth = 210 - (margin * 2); // A4 width minus margins
+  const pageHeight = 297; // A4 height in mm
     
     for (let i = 0; i < pages.length; i++) {
       if (i > 0) {
@@ -350,20 +389,31 @@ export async function generateRecipePDF(recipe, mealTypeLabel) {
         await new Promise(resolve => setTimeout(resolve, 100));
         
         const canvas = await html2canvas(pageDiv, {
-          scale: 2,
+          scale: 3, // Increased from 2 to 3 for better resolution (Print as PDF quality)
           useCORS: true,
           logging: false,
           backgroundColor: '#ffffff',
-          width: 794,
+          width: 700,
           height: pageDiv.scrollHeight,
-          windowWidth: 794,
+          windowWidth: 700,
           windowHeight: pageDiv.scrollHeight,
-          letterRendering: true
+          letterRendering: true,
+          allowTaint: false,
+          removeContainer: false,
+          imageTimeout: 15000,
+          onclone: (clonedDoc) => {
+            // Ensure all text is rendered with high quality
+            const clonedBody = clonedDoc.body;
+            clonedBody.style.webkitFontSmoothing = 'antialiased';
+            clonedBody.style.mozOsxFontSmoothing = 'grayscale';
+            clonedBody.style.textRendering = 'optimizeLegibility';
+          }
         });
         
+        // Use PNG for best text quality (lossless, better for text rendering)
         const imgData = canvas.toDataURL('image/png');
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        const imgHeight = (canvas.height * contentWidth) / canvas.width;
+        doc.addImage(imgData, 'PNG', margin, margin, contentWidth, imgHeight, undefined, 'FAST');
       } finally {
         document.body.removeChild(pageDiv);
       }
@@ -385,102 +435,175 @@ export async function generateRecipePDF(recipe, mealTypeLabel) {
 }
 
 /**
- * Generate PDF with all recipes - each recipe on a new page
+ * Helper function to add a page to PDF and return current page number
+ */
+function addPageToPDF(doc, pageDiv, imgWidth, pageHeightPx) {
+  return new Promise(async (resolve) => {
+    try {
+      await waitForImages(pageDiv);
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const canvas = await html2canvas(pageDiv, {
+        scale: 3, // Increased from 2 to 3 for better resolution (Print as PDF quality)
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        width: 700,
+        height: pageDiv.scrollHeight,
+        windowWidth: 700,
+        windowHeight: pageDiv.scrollHeight,
+        letterRendering: true,
+        allowTaint: false,
+        removeContainer: false,
+        imageTimeout: 15000,
+        onclone: (clonedDoc) => {
+          // Ensure all text is rendered with high quality
+          const clonedBody = clonedDoc.body;
+          clonedBody.style.webkitFontSmoothing = 'antialiased';
+          clonedBody.style.mozOsxFontSmoothing = 'grayscale';
+          clonedBody.style.textRendering = 'optimizeLegibility';
+        }
+      });
+      
+      // Use PNG for best text quality (lossless, better for text rendering)
+      const imgData = canvas.toDataURL('image/png');
+      const margin = 15; // 15mm margin on all sides
+      const contentWidth = 210 - (margin * 2); // A4 width minus margins
+      const imgHeight = (canvas.height * contentWidth) / canvas.width;
+      doc.addImage(imgData, 'PNG', margin, margin, contentWidth, imgHeight, undefined, 'FAST');
+      
+      resolve(doc.internal.getCurrentPageInfo().pageNumber);
+    } catch (error) {
+      console.error('Error adding page to PDF:', error);
+      resolve(doc.internal.getCurrentPageInfo().pageNumber);
+    }
+  });
+}
+
+/**
+ * Generate PDF with all recipes - grouped by mealType with chapters and TOC with page numbers
  */
 export async function generateAllRecipesPDF(recipes, mealTypes) {
   await waitForFonts();
   
-  const doc = new jsPDF('p', 'mm', 'a4');
-  const imgWidth = 210;
+  const margin = 15; // 15mm margin on all sides
+  const contentWidth = 210 - (margin * 2); // A4 width minus margins
+  const contentWidthPx = 700; // Content width in pixels
   const pageHeight = 297;
   const pageHeightPx = 1123; // 297mm at 96 DPI
 
-  // Add table of contents
-  const tocHTML = createTOCHTML(recipes, mealTypes);
-  const tocDiv = document.createElement('div');
-  tocDiv.innerHTML = tocHTML;
-  tocDiv.style.position = 'fixed';
-  tocDiv.style.top = '0';
-  tocDiv.style.left = '0';
-  tocDiv.style.width = '794px';
-  tocDiv.style.maxWidth = '794px';
-  tocDiv.style.background = 'white';
-  tocDiv.style.zIndex = '-1';
-  document.body.appendChild(tocDiv);
+  // Group recipes by mealType
+  const recipesByMealType = {};
+  recipes.forEach(recipe => {
+    const mealType = recipe.mealType || 'other';
+    if (!recipesByMealType[mealType]) {
+      recipesByMealType[mealType] = [];
+    }
+    recipesByMealType[mealType].push(recipe);
+  });
 
-  try {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    
-    const tocPages = splitContentIntoPages(tocDiv, pageHeightPx);
-    
-    for (let i = 0; i < tocPages.length; i++) {
-      if (i > 0) {
-        doc.addPage();
-      }
+  // Sort mealTypes for consistent ordering
+  const sortedMealTypes = Object.keys(recipesByMealType).sort();
+
+  // First pass: Generate content to determine page numbers
+  const contentPages = []; // Store page data
+  const recipePageMap = [];
+  let currentPage = 1;
+
+  // Generate all content and track page numbers
+  for (const mealType of sortedMealTypes) {
+    const mealTypeLabel = mealTypes.find(mt => mt.value === mealType)?.label || mealType;
+    const mealTypeRecipes = recipesByMealType[mealType];
+
+    // Add chapter header
+    const chapterHTML = createChapterHTML(mealTypeLabel);
+    const chapterDiv = document.createElement('div');
+    chapterDiv.innerHTML = chapterHTML;
+    chapterDiv.style.position = 'fixed';
+    chapterDiv.style.top = '0';
+    chapterDiv.style.left = '0';
+    chapterDiv.style.width = '700px';
+    chapterDiv.style.maxWidth = '700px';
+    chapterDiv.style.background = 'white';
+    chapterDiv.style.zIndex = '-1';
+    document.body.appendChild(chapterDiv);
+
+    try {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      const chapterPages = splitContentIntoPages(chapterDiv, pageHeightPx);
       
-      const pageDiv = tocPages[i];
-      pageDiv.style.position = 'fixed';
-      pageDiv.style.top = '0';
-      pageDiv.style.left = '0';
-      pageDiv.style.zIndex = '-1';
-      document.body.appendChild(pageDiv);
-      
-      try {
-        // Wait for images to load on TOC page
-        await waitForImages(pageDiv);
-        await new Promise(resolve => setTimeout(resolve, 100));
+      for (let i = 0; i < chapterPages.length; i++) {
+        const pageDiv = chapterPages[i];
+        pageDiv.style.position = 'fixed';
+        pageDiv.style.top = '0';
+        pageDiv.style.left = '0';
+        pageDiv.style.zIndex = '-1';
+        document.body.appendChild(pageDiv);
         
-        const canvas = await html2canvas(pageDiv, {
-          scale: 2,
-          useCORS: true,
-          logging: false,
-          backgroundColor: '#ffffff',
-          width: 794,
-          height: pageDiv.scrollHeight,
-          windowWidth: 794,
-          windowHeight: pageDiv.scrollHeight,
-          letterRendering: true
-        });
-        
-        const imgData = canvas.toDataURL('image/png');
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-      } finally {
-        document.body.removeChild(pageDiv);
+        try {
+          await waitForImages(pageDiv);
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
+          const canvas = await html2canvas(pageDiv, {
+            scale: 3,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff',
+            width: 700,
+            height: pageDiv.scrollHeight,
+            windowWidth: 700,
+            windowHeight: pageDiv.scrollHeight,
+            letterRendering: true,
+            allowTaint: false,
+            removeContainer: false,
+            imageTimeout: 15000,
+            onclone: (clonedDoc) => {
+              const clonedBody = clonedDoc.body;
+              clonedBody.style.webkitFontSmoothing = 'antialiased';
+              clonedBody.style.mozOsxFontSmoothing = 'grayscale';
+              clonedBody.style.textRendering = 'optimizeLegibility';
+            }
+          });
+          
+          const imgData = canvas.toDataURL('image/png');
+          const imgHeight = (canvas.height * contentWidth) / canvas.width;
+          contentPages.push({ imgData, imgHeight, pageNumber: currentPage });
+          currentPage++;
+        } finally {
+          document.body.removeChild(pageDiv);
+        }
       }
+    } finally {
+      document.body.removeChild(chapterDiv);
     }
 
-    // Add each recipe on a new page
-    for (let i = 0; i < recipes.length; i++) {
-      const recipe = recipes[i];
-      const mealTypeLabel = mealTypes.find(mt => mt.value === recipe.mealType)?.label || recipe.mealType;
-      const recipeHTML = createSingleRecipeHTML(recipe, mealTypeLabel);
+    // Add recipes for this mealType
+    for (let i = 0; i < mealTypeRecipes.length; i++) {
+      const recipe = mealTypeRecipes[i];
+      const recipeMealTypeLabel = mealTypes.find(mt => mt.value === recipe.mealType)?.label || recipe.mealType;
+      const recipeHTML = createSingleRecipeHTML(recipe, recipeMealTypeLabel);
       
       const recipeDiv = document.createElement('div');
       recipeDiv.innerHTML = recipeHTML;
       recipeDiv.style.position = 'fixed';
       recipeDiv.style.top = '0';
       recipeDiv.style.left = '0';
-      recipeDiv.style.width = '794px';
-      recipeDiv.style.maxWidth = '794px';
+      recipeDiv.style.width = '700px';
+      recipeDiv.style.maxWidth = '700px';
       recipeDiv.style.background = 'white';
       recipeDiv.style.zIndex = '-1';
       document.body.appendChild(recipeDiv);
 
       try {
-        // Wait for images to load
         await waitForImages(recipeDiv);
         await new Promise(resolve => setTimeout(resolve, 200));
         
-        // Split recipe into pages with smart breaks
         const recipePages = splitContentIntoPages(recipeDiv, pageHeightPx);
         
+        // Track the first page of this recipe (accounting for TOC pages that will be added)
+        const recipeFirstPage = currentPage;
+        
         for (let j = 0; j < recipePages.length; j++) {
-          // Add new page before each recipe (except first page of first recipe)
-          if (i > 0 || j > 0) {
-            doc.addPage();
-          }
-          
           const pageDiv = recipePages[j];
           pageDiv.style.position = 'fixed';
           pageDiv.style.top = '0';
@@ -489,34 +612,130 @@ export async function generateAllRecipesPDF(recipes, mealTypes) {
           document.body.appendChild(pageDiv);
           
           try {
-            // Wait for images to load on recipe page
             await waitForImages(pageDiv);
             await new Promise(resolve => setTimeout(resolve, 100));
             
             const canvas = await html2canvas(pageDiv, {
-              scale: 2,
+              scale: 3,
               useCORS: true,
               logging: false,
               backgroundColor: '#ffffff',
-              width: 794,
+              width: 700,
               height: pageDiv.scrollHeight,
-              windowWidth: 794,
+              windowWidth: 700,
               windowHeight: pageDiv.scrollHeight,
-              letterRendering: true
+              letterRendering: true,
+              allowTaint: false,
+              removeContainer: false,
+              imageTimeout: 15000,
+              onclone: (clonedDoc) => {
+                const clonedBody = clonedDoc.body;
+                clonedBody.style.webkitFontSmoothing = 'antialiased';
+                clonedBody.style.mozOsxFontSmoothing = 'grayscale';
+                clonedBody.style.textRendering = 'optimizeLegibility';
+              }
             });
             
             const imgData = canvas.toDataURL('image/png');
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+            const imgHeight = (canvas.height * contentWidth) / canvas.width;
+            contentPages.push({ imgData, imgHeight, pageNumber: currentPage });
+            currentPage++;
           } finally {
             document.body.removeChild(pageDiv);
           }
         }
+        
+        // Store recipe with its first page number (will be adjusted for TOC pages)
+        recipePageMap.push({ recipe, pageNumber: recipeFirstPage });
       } finally {
         document.body.removeChild(recipeDiv);
       }
     }
+  }
 
+  // First, determine how many TOC pages we'll have (estimate)
+  // We'll generate TOC, see how many pages, then adjust page numbers
+  // Note: Title page will be page 1, so TOC pages start from page 2
+  const tocHTML = createTOCHTML(recipePageMap.map(({ recipe, pageNumber }) => ({ 
+    recipe, 
+    pageNumber: pageNumber + 1 // Temporary estimate, will be adjusted
+  })), mealTypes);
+  const tocDiv = document.createElement('div');
+  tocDiv.innerHTML = tocHTML;
+  tocDiv.style.position = 'fixed';
+  tocDiv.style.top = '0';
+  tocDiv.style.left = '0';
+  tocDiv.style.width = '700px';
+  tocDiv.style.maxWidth = '700px';
+  tocDiv.style.background = 'white';
+  tocDiv.style.zIndex = '-1';
+  document.body.appendChild(tocDiv);
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 200));
+    const tocPages = splitContentIntoPages(tocDiv, pageHeightPx);
+    // Title page (1) + TOC pages
+    const tocPageCount = 1 + tocPages.length;
+    
+    // Adjust page numbers in recipePageMap to account for title page + TOC pages
+    const adjustedRecipePageMap = recipePageMap.map(({ recipe, pageNumber }) => ({
+      recipe,
+      pageNumber: pageNumber + tocPageCount
+    }));
+    
+    // Regenerate TOC with correct page numbers
+    const correctedTocHTML = createTOCHTML(adjustedRecipePageMap, mealTypes);
+    tocDiv.innerHTML = correctedTocHTML;
+    await new Promise(resolve => setTimeout(resolve, 100));
+    const correctedTocPages = splitContentIntoPages(tocDiv, pageHeightPx);
+    
+    // Build final PDF: Title page first, then TOC, then content
+    const doc = new jsPDF('p', 'mm', 'a4');
+    
+    // Add title page
+    const titleHTML = createTitlePageHTML();
+    const titleDiv = document.createElement('div');
+    titleDiv.innerHTML = titleHTML;
+    titleDiv.style.position = 'fixed';
+    titleDiv.style.top = '0';
+    titleDiv.style.left = '0';
+    titleDiv.style.width = '700px';
+    titleDiv.style.maxWidth = '700px';
+    titleDiv.style.background = 'white';
+    titleDiv.style.zIndex = '-1';
+    document.body.appendChild(titleDiv);
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      await addPageToPDF(doc, titleDiv, contentWidth, pageHeightPx);
+    } finally {
+      document.body.removeChild(titleDiv);
+    }
+    
+    // Add TOC pages
+    for (let i = 0; i < correctedTocPages.length; i++) {
+      doc.addPage();
+      
+      const pageDiv = correctedTocPages[i];
+      pageDiv.style.position = 'fixed';
+      pageDiv.style.top = '0';
+      pageDiv.style.left = '0';
+      pageDiv.style.zIndex = '-1';
+      document.body.appendChild(pageDiv);
+      
+      try {
+        await addPageToPDF(doc, pageDiv, contentWidth, pageHeightPx);
+      } finally {
+        document.body.removeChild(pageDiv);
+      }
+    }
+    
+    // Now add all content pages with proper dimensions
+    for (const contentPage of contentPages) {
+      doc.addPage();
+      doc.addImage(contentPage.imgData, 'PNG', margin, margin, contentWidth, contentPage.imgHeight, undefined, 'FAST');
+    }
+    
     doc.save('Успяваме-заедно-всички-рецепти-2025.pdf');
   } finally {
     document.body.removeChild(tocDiv);
