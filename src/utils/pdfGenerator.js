@@ -167,6 +167,7 @@ function createTitlePageHTML() {
     <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif; padding: 40px; color: #333; background: white; width: 700px; box-sizing: border-box; min-height: 1043px; display: flex; align-items: center; justify-content: center;">
       <div style="text-align: center;">
         <h1 style="font-size: 36px; font-weight: bold; margin: 0; color: #2c3e50;">Книга със здравословни рецепти</h1>
+        <h2 style="font-size: 18px; font-weight: normal; margin: 16px 0 0 0; color: #888;">на група "Звездичка" към ДГ "Слънчев дом"</h2>
       </div>
     </div>
   `;
