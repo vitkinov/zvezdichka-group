@@ -124,7 +124,7 @@ function createSingleRecipeHTML(recipe, mealTypeLabel) {
     const numberedMatch = trimmedLine.match(/^\d+\.\s+(.+)$/);
     if (numberedMatch) {
       const text = numberedMatch[1].replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      htmlContent += `<p style="font-size: 11px; margin: 4px 0; padding-left: 20px; page-break-inside: avoid; orphans: 2; widows: 2;">${trimmedLine}</p>`;
+      htmlContent += `<p style="font-size: 11px; margin: 4px 0; padding-left: 20px; page-break-inside: avoid; orphans: 2; widows: 2;">${text}</p>`;
       return;
     }
 
