@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, User, UtensilsCrossed, FileDown, ExternalLink } from 'lucide-react';
-import { parseRecipeMarkdown, generateRecipeMarkdown, generateRecipeFilename, downloadMarkdownFile } from './utils/recipeParser';
-import { generateRecipePDF, generateAllRecipesPDF } from './utils/pdfGenerator';
+import { parseRecipeMarkdown } from './utils/recipeParser';
+import { generateAllRecipesPDF } from './utils/pdfGenerator';
 import { recipeFiles } from './recipes/discovered';
 import { getMealTypesFromRecipes, getMealTypeLabel, getDefaultMealTypes } from './utils/mealTypes';
 import { getRecipeImage } from './utils/recipeImage';
@@ -15,13 +15,6 @@ function RecipeBook() {
   const [mealTypes, setMealTypes] = useState(getDefaultMealTypes());
   const [loading, setLoading] = useState(true);
   const [selectedMealType, setSelectedMealType] = useState('all');
-  const [formData, setFormData] = useState({
-    title: '',
-    mealType: 'breakfast',
-    author: '',
-    photo: '',
-    content: ''
-  });
 
   useEffect(() => {
     loadRecipes();
@@ -73,69 +66,6 @@ function RecipeBook() {
     }
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    if (!formData.title || !formData.author || !formData.content) {
-      alert('Моля, попълнете всички задължителни полета!');
-      return;
-    }
-
-    const newRecipe = {
-      id: Date.now().toString(),
-      ...formData
-    };
-
-    // Generate markdown content
-    const markdownContent = generateRecipeMarkdown(newRecipe);
-    const filename = generateRecipeFilename(formData.title);
-    
-    // Download the markdown file
-    downloadMarkdownFile(markdownContent, filename);
-    
-    // Show success message with instructions
-    alert(
-      `Рецептата е генерирана и изтеглена!\n\n` +
-      `Файл: ${filename}\n\n` +
-      `Моля, поставете файла в папката public/recipes/ и рестартирайте приложението за да се покаже автоматично.`
-    );
-    
-    // Reset form
-    setFormData({
-      title: '',
-      mealType: 'breakfast',
-      author: '',
-      photo: '',
-      content: ''
-    });
-    
-    setShowForm(false);
-    
-    // Auto-refresh recipes after a short delay to allow user to add the file
-    setTimeout(() => {
-      loadRecipes();
-    }, 1000);
-  };
-
-
-  const handleDownloadPDF = async (recipe) => {
-    const mealTypeLabel = getMealTypeLabel(recipe.mealType);
-    try {
-      await generateRecipePDF(recipe, mealTypeLabel);
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('Грешка при генериране на PDF файла. Моля, опитайте отново.');
-    }
-  };
-
   const handleDownloadAllPDF = async () => {
     if (filteredRecipes.length === 0) {
       alert('Няма рецепти за изтегляне!');
@@ -159,109 +89,6 @@ function RecipeBook() {
       .replace(/`(.*?)`/g, '$1') // Inline code `code`
       .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1') // Links [text](url)
       .trim();
-  };
-
-  const renderRecipeContent = (content) => {
-    const lines = content.split('\n');
-    const elements = [];
-    let currentList = null;
-    let listItems = [];
-    let keyIndex = 0;
-
-    const flushList = () => {
-      if (currentList && listItems.length > 0) {
-        if (currentList.type === 'ul') {
-          elements.push(
-            <ul key={keyIndex++} className="recipe-text">
-              {listItems}
-            </ul>
-          );
-        } else {
-          elements.push(
-            <ol key={keyIndex++} className="recipe-text">
-              {listItems}
-            </ol>
-          );
-        }
-        listItems = [];
-        currentList = null;
-      }
-    };
-
-    lines.forEach((line) => {
-      const trimmedLine = line.trim();
-      
-      // Handle markdown headings
-      if (trimmedLine.startsWith('## ')) {
-        flushList();
-        elements.push(<h3 key={keyIndex++} className="recipe-content-h3">{trimmedLine.substring(3)}</h3>);
-        return;
-      }
-      if (trimmedLine.startsWith('### ')) {
-        flushList();
-        elements.push(<h4 key={keyIndex++} className="recipe-content-h4">{trimmedLine.substring(4)}</h4>);
-        return;
-      }
-      if (trimmedLine.startsWith('# ')) {
-        flushList();
-        elements.push(<h2 key={keyIndex++} className="recipe-content-h2">{trimmedLine.substring(2)}</h2>);
-        return;
-      }
-      
-      // Handle bullet lists
-      if (trimmedLine.startsWith('- ') || trimmedLine.startsWith('* ')) {
-        if (currentList?.type !== 'ul') {
-          flushList();
-          currentList = { type: 'ul' };
-        }
-        listItems.push(<li key={keyIndex++} className="recipe-content-li">{trimmedLine.substring(2)}</li>);
-        return;
-      }
-      
-      // Handle numbered lists
-      const numberedMatch = trimmedLine.match(/^\d+\.\s+(.+)$/);
-      if (numberedMatch) {
-        if (currentList?.type !== 'ol') {
-          flushList();
-          currentList = { type: 'ol' };
-        }
-        listItems.push(<li key={keyIndex++} className="recipe-content-li">{numberedMatch[1]}</li>);
-        return;
-      }
-      
-      // Non-list line - flush any current list
-      flushList();
-      
-      // Handle bold text (**text**)
-      if (trimmedLine.includes('**')) {
-        const parts = trimmedLine.split(/(\*\*.*?\*\*)/g);
-        elements.push(
-          <p key={keyIndex++}>
-            {parts.map((part, partIndex) => {
-              if (part.startsWith('**') && part.endsWith('**')) {
-                return <strong key={partIndex}>{part.slice(2, -2)}</strong>;
-              }
-              return <span key={partIndex}>{part}</span>;
-            })}
-          </p>
-        );
-        return;
-      }
-      
-      // Regular paragraph
-      if (trimmedLine) {
-        elements.push(<p key={keyIndex++}>{trimmedLine}</p>);
-        return;
-      }
-      
-      // Empty line
-      elements.push(<br key={keyIndex++} />);
-    });
-
-    // Flush any remaining list
-    flushList();
-
-    return elements;
   };
 
   const filteredRecipes = recipes.filter(recipe => {
