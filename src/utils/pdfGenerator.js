@@ -2,83 +2,6 @@ import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { getRecipeImage } from './recipeImage';
 
-// Debug mode - set to true to enable detailed logging and visual inspection
-// 
-// HOW TO DEBUG PDF GENERATION:
-// 1. Set DEBUG_PDF to true above
-// 2. Open browser DevTools (F12) and go to Console tab
-// 3. Generate a PDF - you'll see detailed logs with:
-//    - HTML content information
-//    - Element dimensions (scrollHeight, offsetHeight, etc.)
-//    - Page splitting information
-//    - Canvas dimensions
-//    - Image dimensions for PDF
-// 4. Visual inspection: Elements will be temporarily visible with red borders
-// 5. Check the Console for html2canvas warnings/errors
-// 6. Use browser DevTools Elements tab to inspect the DOM structure
-// 7. Check Network tab for image loading issues
-//
-// TIPS:
-// - Look for scrollHeight > pageHeightPx (794px) - indicates overflow
-// - Check canvas dimensions match expected values
-// - Verify images are loaded (check Network tab)
-// - Inspect computed styles in debugElement output
-const DEBUG_PDF = true; // Change to true to enable debugging
-
-/**
- * Debug helper functions
- */
-function debugLog(...args) {
-  if (DEBUG_PDF) {
-    console.log('[PDF Debug]', ...args);
-  }
-}
-
-// Always log when debug mode is enabled (to verify it's working)
-if (DEBUG_PDF) {
-  console.log('[PDF Debug] ============================================');
-  console.log('[PDF Debug] Debug mode is ENABLED');
-  console.log('[PDF Debug] You should see this message when the file loads');
-  console.log('[PDF Debug] ============================================');
-}
-
-function debugElement(element, label) {
-  if (DEBUG_PDF) {
-    console.log(`[PDF Debug] ${label}:`, {
-      tagName: element.tagName,
-      className: element.className,
-      scrollHeight: element.scrollHeight,
-      offsetHeight: element.offsetHeight,
-      clientHeight: element.clientHeight,
-      scrollWidth: element.scrollWidth,
-      offsetWidth: element.offsetWidth,
-      clientWidth: element.clientWidth,
-      innerHTML: element.innerHTML.substring(0, 100) + '...',
-      computedStyle: window.getComputedStyle(element)
-    });
-  }
-}
-
-function makeElementVisible(element, label) {
-  if (DEBUG_PDF) {
-    element.style.position = 'fixed';
-    element.style.top = '0';
-    element.style.left = '0';
-    element.style.zIndex = '9999';
-    element.style.border = '2px solid red';
-    element.style.background = 'white';
-    element.style.padding = '10px';
-    element.setAttribute('data-debug-label', label);
-    console.log(`[PDF Debug] Made element visible: ${label}`);
-    // Keep it visible for 5 seconds
-    setTimeout(() => {
-      if (element.parentNode) {
-        element.style.border = 'none';
-      }
-    }, 5000);
-  }
-}
-
 /**
  * Create HTML content for a recipe
  */
@@ -87,7 +10,6 @@ function createRecipeHTML(recipe, mealTypeLabel) {
   let htmlContent = '';
   
   lines.forEach((line) => {
-    debugger;
     const trimmedLine = line.trim();
     
     if (!trimmedLine) {
@@ -478,16 +400,9 @@ function waitForImages(element) {
  * Generate PDF from recipe data using html2canvas with smart page breaks
  */
 export async function generateRecipePDF(recipe, mealTypeLabel) {
-  debugLog('=== PDF GENERATION STARTED ===');
-  debugLog('Recipe:', recipe.title);
-  debugLog('Meal Type:', mealTypeLabel);
-  debugLog('DEBUG_PDF mode:', DEBUG_PDF);
-  
   await waitForFonts();
-  debugLog('Fonts loaded');
   
   const htmlContent = createRecipeHTML(recipe, mealTypeLabel);
-  debugLog('Generated HTML content length:', htmlContent.length);
   
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = htmlContent;
@@ -499,26 +414,17 @@ export async function generateRecipePDF(recipe, mealTypeLabel) {
   tempDiv.style.background = 'white';
   tempDiv.style.zIndex = '-1';
   document.body.appendChild(tempDiv);
-  
-  debugElement(tempDiv, 'Initial tempDiv');
-  if (DEBUG_PDF) {
-    makeElementVisible(tempDiv.cloneNode(true), 'Initial HTML');
-  }
 
   try {
     // Wait for images to load
     await waitForImages(tempDiv);
     await new Promise(resolve => setTimeout(resolve, 200));
     
-    debugElement(tempDiv, 'After images loaded');
-    
     // Calculate page height in pixels (A5 at 96 DPI)
     const pageHeightPx = 794; // 210mm at 96 DPI
-    debugLog('Page height (px):', pageHeightPx);
     
     // Split content into pages with smart breaks
     const pages = splitContentIntoPages(tempDiv, pageHeightPx);
-    debugLog('Number of pages generated:', pages.length);
     
   const doc = new jsPDF('p', 'mm', 'a5');
   const margin = 15; // 15mm margin on all sides
@@ -537,23 +443,15 @@ export async function generateRecipePDF(recipe, mealTypeLabel) {
       pageDiv.style.zIndex = '-1';
       document.body.appendChild(pageDiv);
       
-      debugLog(`Processing page ${i + 1}/${pages.length}`);
-      debugElement(pageDiv, `Page ${i + 1}`);
-      if (DEBUG_PDF) {
-        makeElementVisible(pageDiv.cloneNode(true), `Page ${i + 1}`);
-      }
-      
       try {
         // Wait for images to load on this page
         await waitForImages(pageDiv);
         await new Promise(resolve => setTimeout(resolve, 100));
         
-        debugLog(`Page ${i + 1} - scrollHeight:`, pageDiv.scrollHeight, 'pageHeightPx:', pageHeightPx);
-        
         const canvas = await html2canvas(pageDiv, {
           scale: 3, // Increased from 2 to 3 for better resolution (Print as PDF quality)
           useCORS: true,
-          logging: DEBUG_PDF, // Enable html2canvas logging in debug mode
+          logging: false,
           backgroundColor: '#ffffff',
           width: 450,
           height: pageDiv.scrollHeight,
@@ -572,24 +470,9 @@ export async function generateRecipePDF(recipe, mealTypeLabel) {
           }
         });
         
-        debugLog(`Page ${i + 1} - Canvas dimensions:`, {
-          width: canvas.width,
-          height: canvas.height,
-          scrollHeight: pageDiv.scrollHeight
-        });
-        
         // Use PNG for best text quality (lossless, better for text rendering)
         const imgData = canvas.toDataURL('image/png');
         const imgHeightMm = calculateImageHeightForPDF(canvas.width, canvas.height, contentWidth, 3);
-        
-        debugLog(`Page ${i + 1} - Image dimensions for PDF:`, {
-          canvasWidth: canvas.width,
-          canvasHeight: canvas.height,
-          contentWidthMm: contentWidth,
-          imgHeightMm: imgHeightMm,
-          margin: margin
-        });
-        
         doc.addImage(imgData, 'PNG', margin, margin, contentWidth, imgHeightMm, undefined, 'FAST');
       } finally {
         document.body.removeChild(pageDiv);
@@ -661,17 +544,11 @@ function addPageToPDF(doc, pageDiv, imgWidth, pageHeightPx) {
  * Generate PDF with all recipes - grouped by mealType with chapters and TOC with page numbers
  */
 export async function generateAllRecipesPDF(recipes, mealTypes) {
-  debugLog('=== ALL RECIPES PDF GENERATION STARTED ===');
-  debugLog('Number of recipes:', recipes.length);
-  debugLog('DEBUG_PDF mode:', DEBUG_PDF);
-  
   await waitForFonts();
-  debugLog('Fonts loaded');
   
   const margin = 15; // 15mm margin on all sides
   const contentWidth = 148 - (margin * 2); // A5 width minus margins (148mm)
   const pageHeightPx = 794; // 210mm at 96 DPI
-  debugLog('Page dimensions - width:', contentWidth, 'height (px):', pageHeightPx);
 
   // Group recipes by mealType
   const recipesByMealType = {};
