@@ -1,6 +1,7 @@
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { getRecipeImage } from './recipeImage';
+import { MEAL_TYPE_LABELS } from './mealTypes';
 
 /**
  * Create HTML content for a recipe
@@ -204,9 +205,10 @@ function createTOCHTML(recipePageMap, mealTypes) {
       currentMealType = recipe.mealType;
     }
     
-    tocHTML += `<p style="margin: 4px 0; padding-left: 20px; font-size: 10px; display: flex; justify-content: space-between;">
-      <span>${recipe.title}</span>
-      <span style="color: #666; font-weight: normal;">стр. ${pageNumber}</span>
+    tocHTML += `<p style="margin: 4px 0; padding-left: 20px; font-size: 10px; display: flex; align-items: flex-end; gap: 8px;">
+      <span style="flex-shrink: 0;">${recipe.title}</span>
+      <span style="flex: 1; border-bottom: 1px dotted #999; margin: 0 4px 2px 4px; min-width: 20px; height: 1px;"></span>
+      <span style="color: #666; font-weight: normal; flex-shrink: 0;">${pageNumber}</span>
     </p>`;
   });
 
@@ -560,8 +562,31 @@ export async function generateAllRecipesPDF(recipes, mealTypes) {
     recipesByMealType[mealType].push(recipe);
   });
 
-  // Sort mealTypes for consistent ordering
-  const sortedMealTypes = Object.keys(recipesByMealType).sort();
+  // Sort recipes within each mealType by title (ascending)
+  Object.keys(recipesByMealType).forEach(mealType => {
+    recipesByMealType[mealType].sort((a, b) => {
+      const titleA = (a.title || '').toLowerCase();
+      const titleB = (b.title || '').toLowerCase();
+      return titleA.localeCompare(titleB);
+    });
+  });
+
+  // Sort mealTypes by MEAL_TYPE_LABELS order, then alphabetically for any not in labels
+  const mealTypeOrder = Object.keys(MEAL_TYPE_LABELS);
+  const sortedMealTypes = Object.keys(recipesByMealType).sort((a, b) => {
+    const indexA = mealTypeOrder.indexOf(a);
+    const indexB = mealTypeOrder.indexOf(b);
+    
+    // If both are in MEAL_TYPE_LABELS, sort by index
+    if (indexA !== -1 && indexB !== -1) {
+      return indexA - indexB;
+    }
+    // If only one is in MEAL_TYPE_LABELS, it comes first
+    if (indexA !== -1) return -1;
+    if (indexB !== -1) return 1;
+    // If neither is in MEAL_TYPE_LABELS, sort alphabetically
+    return a.localeCompare(b);
+  });
 
   // First pass: Generate content to determine page numbers
   const contentPages = []; // Store page data

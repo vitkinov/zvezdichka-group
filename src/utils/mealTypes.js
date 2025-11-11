@@ -1,7 +1,8 @@
 // Utility for managing meal types dynamically from recipes
 
 // Bulgarian labels mapping for meal types
-const MEAL_TYPE_LABELS = {
+// Order in this object defines the sorting order
+export const MEAL_TYPE_LABELS = {
   breakfast: 'Закуска',
   lunch: 'Обяд',
   dinner: 'Вечеря',

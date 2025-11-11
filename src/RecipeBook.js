@@ -4,7 +4,7 @@ import { BookOpen, User, UtensilsCrossed, FileDown, ExternalLink } from 'lucide-
 import { parseRecipeMarkdown } from './utils/recipeParser';
 import { generateAllRecipesPDF } from './utils/pdfGenerator';
 import { recipeFiles } from './recipes/discovered';
-import { getMealTypesFromRecipes, getMealTypeLabel, getDefaultMealTypes } from './utils/mealTypes';
+import { getMealTypesFromRecipes, getMealTypeLabel, getDefaultMealTypes, MEAL_TYPE_LABELS } from './utils/mealTypes';
 import { getRecipeImage } from './utils/recipeImage';
 import './RecipeBook.css';
 
@@ -91,12 +91,38 @@ function RecipeBook() {
       .trim();
   };
 
-  const filteredRecipes = recipes.filter(recipe => {
-    if (selectedMealType === 'all') {
-      return true;
-    }
-    return recipe.mealType === selectedMealType;
-  });
+  const filteredRecipes = recipes
+    .filter(recipe => {
+      if (selectedMealType === 'all') {
+        return true;
+      }
+      return recipe.mealType === selectedMealType;
+    })
+    .sort((a, b) => {
+      // First sort by mealType according to MEAL_TYPE_LABELS order
+      const mealTypeOrder = Object.keys(MEAL_TYPE_LABELS);
+      const indexA = mealTypeOrder.indexOf(a.mealType || '');
+      const indexB = mealTypeOrder.indexOf(b.mealType || '');
+      
+      if (indexA !== indexB) {
+        // If both are in MEAL_TYPE_LABELS, sort by index
+        if (indexA !== -1 && indexB !== -1) {
+          return indexA - indexB;
+        }
+        // If only one is in MEAL_TYPE_LABELS, it comes first
+        if (indexA !== -1) return -1;
+        if (indexB !== -1) return 1;
+        // If neither is in MEAL_TYPE_LABELS, sort alphabetically
+        const mealTypeA = (a.mealType || '').toLowerCase();
+        const mealTypeB = (b.mealType || '').toLowerCase();
+        return mealTypeA.localeCompare(mealTypeB);
+      }
+      
+      // If same mealType, sort by title (ascending)
+      const titleA = (a.title || '').toLowerCase();
+      const titleB = (b.title || '').toLowerCase();
+      return titleA.localeCompare(titleB);
+    });
 
   return (
     <div className="recipe-book">
