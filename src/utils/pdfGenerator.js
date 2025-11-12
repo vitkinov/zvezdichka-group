@@ -205,10 +205,10 @@ function createTOCHTML(recipePageMap, mealTypes) {
       currentMealType = recipe.mealType;
     }
     
-    tocHTML += `<p style="margin: 4px 0; padding-left: 20px; font-size: 10px; display: flex; align-items: flex-end; gap: 8px;">
+    tocHTML += `<p style="margin: 4px 0; padding-left: 20px; font-size: 10px; display: flex; align-items: flex-end; gap: 2px;">
       <span style="flex-shrink: 0;">${recipe.title}</span>
-      <span style="flex: 1; border-bottom: 1px dotted #999; margin: 0 4px 2px 4px; height: 1px;"></span>
-      <span style="color: #666; font-weight: normal; flex-shrink: 0;">${pageNumber}</span>
+      <span style="flex: 1; border-bottom: 1px dotted #999; height: 1px;"></span>
+      <span style="color: #666; font-weight: normal; flex-shrink: 0; width: 10px;">${pageNumber}</span>
     </p>`;
   });
 
