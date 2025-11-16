@@ -101,6 +101,11 @@ function RecipeDetail() {
         elements.push(<h4 key={keyIndex++} className="recipe-content-h4">{trimmedLine.substring(4)}</h4>);
         return;
       }
+      if (trimmedLine.startsWith('#### ')) {
+        flushList();
+        elements.push(<h5 key={keyIndex++} className="recipe-content-h4">{trimmedLine.substring(4)}</h5>);
+        return;
+      }
       if (trimmedLine.startsWith('# ')) {
         flushList();
         elements.push(<h2 key={keyIndex++} className="recipe-content-h2">{trimmedLine.substring(2)}</h2>);
