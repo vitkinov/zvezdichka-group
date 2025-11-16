@@ -29,6 +29,11 @@ function createRecipeHTML(recipe, mealTypeLabel) {
       return;
     }
 
+    if (trimmedLine.startsWith('#### ')) {
+      htmlContent += `<h5 style="font-size: 12px; font-weight: bold; margin: 10px 0 6px 0; page-break-after: avoid; orphans: 3; widows: 3;">${trimmedLine.substring(4)}</h5>`;
+      return;
+    }
+
     if (trimmedLine.startsWith('# ')) {
       htmlContent += `<h2 style="font-size: 15px; font-weight: bold; margin: 14px 0 10px 0; page-break-after: avoid; orphans: 3; widows: 3;">${trimmedLine.substring(2)}</h2>`;
       return;
