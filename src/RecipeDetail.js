@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, User, UtensilsCrossed, FileDown } from 'lucide-react';
-import { parseRecipeMarkdown } from './utils/recipeParser';
+import { parseRecipeMarkdown, slugToFilename } from './utils/recipeParser';
 import { generateRecipePDF } from './utils/pdfGenerator';
 import { getMealTypeLabel } from './utils/mealTypes';
 import { getRecipeImage } from './utils/recipeImage';
@@ -10,7 +10,7 @@ import './RecipeDetail.css';
 const RECIPES_DIR = '/recipes';
 
 function RecipeDetail() {
-  const { filename } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -18,15 +18,22 @@ function RecipeDetail() {
 
   useEffect(() => {
     loadRecipe();
-  }, [filename]);
+  }, [slug]);
 
   const loadRecipe = async () => {
     setLoading(true);
     setError(null);
     try {
-      // Decode the filename in case it's URL encoded
-      const decodedFilename = decodeURIComponent(filename);
-      const response = await fetch(`${RECIPES_DIR}/${decodedFilename}`);
+      // Convert slug to filename (add .md extension)
+      const decodedSlug = decodeURIComponent(slug);
+      const filename = slugToFilename(decodedSlug);
+      // Set Accept header to request markdown/text (not text/html) to help servers
+      // distinguish fetch requests from browser navigation
+      const response = await fetch(`${RECIPES_DIR}/${filename}`, {
+        headers: {
+          'Accept': 'text/markdown, text/plain, */*'
+        }
+      });
       if (!response.ok) {
         setError('Рецептата не беше намерена');
         setLoading(false);
@@ -35,8 +42,8 @@ function RecipeDetail() {
       const markdown = await response.text();
       const parsedRecipe = parseRecipeMarkdown(markdown);
       setRecipe({
-        id: decodedFilename,
-        filename: decodedFilename,
+        id: decodedSlug,
+        filename: filename,
         ...parsedRecipe
       });
     } catch (error) {

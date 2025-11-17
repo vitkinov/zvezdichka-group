@@ -243,7 +243,7 @@ function App() {
             </>
           } />
           <Route path="/recipes" element={<RecipeBook />} />
-          <Route path="/recipes/:filename" element={<RecipeDetail />} />
+          <Route path="/recipes/:slug" element={<RecipeDetail />} />
         </Routes>
       </div>
     </div>

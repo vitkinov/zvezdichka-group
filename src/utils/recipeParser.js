@@ -93,3 +93,19 @@ export function downloadMarkdownFile(content, filename) {
   URL.revokeObjectURL(url);
 }
 
+/**
+ * Convert filename to slug (remove .md extension)
+ */
+export function filenameToSlug(filename) {
+  if (!filename) return '';
+  return filename.replace(/\.md$/, '');
+}
+
+/**
+ * Convert slug to filename (add .md extension if not present)
+ */
+export function slugToFilename(slug) {
+  if (!slug) return '';
+  return slug.endsWith('.md') ? slug : `${slug}.md`;
+}
+

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, User, UtensilsCrossed, FileDown, ExternalLink } from 'lucide-react';
-import { parseRecipeMarkdown } from './utils/recipeParser';
+import { parseRecipeMarkdown, filenameToSlug } from './utils/recipeParser';
 import { generateAllRecipesPDF } from './utils/pdfGenerator';
 import { recipeFiles } from './recipes/discovered';
 import { getMealTypesFromRecipes, getMealTypeLabel, getDefaultMealTypes, MEAL_TYPE_LABELS } from './utils/mealTypes';
@@ -30,7 +30,11 @@ function RecipeBook() {
       const loadedRecipes = await Promise.all(
         recipeFiles.map(async (filename) => {
           try {
-            const response = await fetch(`${RECIPES_DIR}/${filename}`);
+            const response = await fetch(`${RECIPES_DIR}/${filename}`, {
+              headers: {
+                'Accept': 'text/markdown, text/plain, */*'
+              }
+            });
             if (!response.ok) {
               console.warn(`Could not load ${filename}`);
               return null;
@@ -191,7 +195,7 @@ function RecipeBook() {
             {filteredRecipes.map((recipe) => (
               <Link 
                 key={recipe.id} 
-                to={`/recipes/${encodeURIComponent(recipe.filename)}`}
+                to={`/recipes/${encodeURIComponent(filenameToSlug(recipe.filename))}`}
                 className="recipe-card-link"
               >
                 <div className="recipe-card">
