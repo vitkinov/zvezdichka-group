@@ -31,7 +31,7 @@ function App() {
     setError('');
     
     // Filter out past events
-    const now = new Date();
+    const now = new Date().setHours(0, 0, 0, 0);
     const upcomingEvents = eventsData.filter(event => {
       let eventEndDate;
       
@@ -52,7 +52,7 @@ function App() {
         eventEndDate = new Date(event.start.dateTime);
       }
       
-      return eventEndDate > now;
+      return eventEndDate >= now;
     });
     
     setEvents(upcomingEvents);
