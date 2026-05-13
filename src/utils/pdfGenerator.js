@@ -48,7 +48,7 @@ function addA5Page(doc) {
 function drawRecipeFooterPageNumber(doc) {
   const pageNum = doc.internal.getCurrentPageInfo().pageNumber;
   doc.setFont('times', 'normal');
-  doc.setFontSize(9);
+  doc.setFontSize(11);
   doc.setTextColor(55, 55, 55);
   const y = PDF_PAGE_H_MM - PDF_RECIPE_PAGE_NUMBER_FROM_BOTTOM_MM;
   doc.text(String(pageNum), PDF_PAGE_W_MM / 2, y, { align: 'center' });
@@ -71,29 +71,29 @@ function createRecipeHTML(recipe, mealTypeLabel) {
 
     // Handle headings
     if (trimmedLine.startsWith('## ')) {
-      htmlContent += `<h3 style="font-size: 13px; font-weight: bold; margin: 12px 0 8px 0; page-break-after: avoid; orphans: 3; widows: 3;">${trimmedLine.substring(3)}</h3>`;
+      htmlContent += `<h3 style="font-size: 16px; font-weight: bold; margin: 12px 0 8px 0; page-break-after: avoid; orphans: 3; widows: 3;">${trimmedLine.substring(3)}</h3>`;
       return;
     }
 
     if (trimmedLine.startsWith('### ')) {
-      htmlContent += `<h4 style="font-size: 12px; font-weight: bold; margin: 10px 0 6px 0; page-break-after: avoid; orphans: 3; widows: 3;">${trimmedLine.substring(4)}</h4>`;
+      htmlContent += `<h4 style="font-size: 15px; font-weight: bold; margin: 10px 0 6px 0; page-break-after: avoid; orphans: 3; widows: 3;">${trimmedLine.substring(4)}</h4>`;
       return;
     }
 
     if (trimmedLine.startsWith('#### ')) {
-      htmlContent += `<h5 style="font-size: 12px; font-weight: bold; margin: 10px 0 6px 0; page-break-after: avoid; orphans: 3; widows: 3;">${trimmedLine.substring(4)}</h5>`;
+      htmlContent += `<h5 style="font-size: 15px; font-weight: bold; margin: 10px 0 6px 0; page-break-after: avoid; orphans: 3; widows: 3;">${trimmedLine.substring(4)}</h5>`;
       return;
     }
 
     if (trimmedLine.startsWith('# ')) {
-      htmlContent += `<h2 style="font-size: 15px; font-weight: bold; margin: 14px 0 10px 0; page-break-after: avoid; orphans: 3; widows: 3;">${trimmedLine.substring(2)}</h2>`;
+      htmlContent += `<h2 style="font-size: 18px; font-weight: bold; margin: 14px 0 10px 0; page-break-after: avoid; orphans: 3; widows: 3;">${trimmedLine.substring(2)}</h2>`;
       return;
     }
 
     // Handle lists
     if (trimmedLine.startsWith('- ') || trimmedLine.startsWith('* ')) {
       const text = trimmedLine.substring(2).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      htmlContent += `<p style="font-size: 12px; margin: 4px 0; padding-left: 20px; page-break-inside: avoid; orphans: 2; widows: 2;">• ${text}</p>`;
+      htmlContent += `<p style="font-size: 15px; margin: 4px 0; padding-left: 20px; page-break-inside: avoid; orphans: 2; widows: 2;">• ${text}</p>`;
       return;
     }
 
@@ -102,7 +102,7 @@ function createRecipeHTML(recipe, mealTypeLabel) {
     if (numberedMatch) {
       const index = numberedMatch[1];
       const text = numberedMatch[2].replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      htmlContent += `<p style="font-size: 12px; margin: 4px 0; padding-left: 20px; page-break-inside: avoid; orphans: 2; widows: 2;">${index}. ${text}</p>`;
+      htmlContent += `<p style="font-size: 15px; margin: 4px 0; padding-left: 20px; page-break-inside: avoid; orphans: 2; widows: 2;">${index}. ${text}</p>`;
       return;
     }
 
@@ -110,7 +110,7 @@ function createRecipeHTML(recipe, mealTypeLabel) {
     let processedLine = trimmedLine.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     
     // Regular paragraph - add page-break-before if needed
-    htmlContent += `<p style="font-size: 12px; margin: 6px 0; line-height: 1.6; page-break-inside: avoid; orphans: 2; widows: 2; ">${processedLine}</p>`;
+    htmlContent += `<p style="font-size: 15px; margin: 6px 0; line-height: 1.6; page-break-inside: avoid; orphans: 2; widows: 2; ">${processedLine}</p>`;
   });
 
   const hasImage = recipe.photo && recipe.photo.trim() !== '';
@@ -118,18 +118,20 @@ function createRecipeHTML(recipe, mealTypeLabel) {
   const W = PDF_CONTENT_WIDTH_PX;
   return `
     <div class="pdf-recipe-root" style="font-family: 'Times New Roman', Times, serif; color: #000000; background: white; width: ${W}px; max-width: ${W}px; box-sizing: border-box;">
+      <div class="pdf-recipe-meal-header" style="margin: 0 0 14px 0; padding-bottom: 10px; border-bottom: 2px solid #000000;">
+        <p style="font-size: 17px; font-weight: bold; margin: 0; color: #000000; word-wrap: break-word;">${mealTypeLabel}</p>
+      </div>
       <div class="pdf-recipe-title-row" style="display: flex; align-items: flex-start; margin-bottom: 16px; gap: 20px;">
         <div style="flex: 1; min-width: 0;">
-          <h1 style="font-size: 20px; font-weight: bold; margin: 0; color: #000000; word-wrap: break-word; overflow-wrap: break-word; line-height: 1.3;">${recipe.title}</h1>
+          <h1 style="font-size: 24px; font-weight: bold; margin: 0; color: #000000; word-wrap: break-word; overflow-wrap: break-word; line-height: 1.3;">${recipe.title}</h1>
         </div>
       </div>
-      <div class="pdf-recipe-meta" style="margin-bottom: 20px; color: #000000; font-size: 9px;">
-        <p style="margin: 4px 0;">Тип: ${mealTypeLabel}</p>
+      <div class="pdf-recipe-meta" style="margin-bottom: 20px; color: #000000; font-size: 11px;">
         <p style="margin: 4px 0;">Автор: ${recipe.author}</p>
       </div>
       <div class="pdf-recipe-body" style="margin-bottom: 20px;">
         ${hasImage ? 
-          `<div class="pdf-recipe-float-wrap" style="float: right; margin-left: 12px; margin-bottom: 10px; width: 160px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          `<div class="pdf-recipe-float-wrap" style="float: right; margin-left: 12px; margin-bottom: 10px; width: 200px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             <img src="${recipeImage}" alt="${recipe.title}" style="width: 100%; height: auto; display: block;" />
           </div>`
         : ''}
@@ -159,23 +161,23 @@ function createSingleRecipeHTML(recipe, mealTypeLabel) {
     }
 
     if (trimmedLine.startsWith('## ')) {
-      htmlContent += `<h3 style="font-size: 12px; font-weight: bold; margin: 12px 0 8px 0; page-break-after: avoid; orphans: 3; widows: 3;">${trimmedLine.substring(3)}</h3>`;
+      htmlContent += `<h3 style="font-size: 15px; font-weight: bold; margin: 12px 0 8px 0; page-break-after: avoid; orphans: 3; widows: 3;">${trimmedLine.substring(3)}</h3>`;
       return;
     }
 
     if (trimmedLine.startsWith('### ')) {
-      htmlContent += `<h4 style="font-size: 11px; font-weight: bold; margin: 10px 0 6px 0; page-break-after: avoid; orphans: 3; widows: 3;">${trimmedLine.substring(4)}</h4>`;
+      htmlContent += `<h4 style="font-size: 14px; font-weight: bold; margin: 10px 0 6px 0; page-break-after: avoid; orphans: 3; widows: 3;">${trimmedLine.substring(4)}</h4>`;
       return;
     }
 
     if (trimmedLine.startsWith('# ')) {
-      htmlContent += `<h2 style="font-size: 14px; font-weight: bold; margin: 14px 0 10px 0; page-break-after: avoid; orphans: 3; widows: 3;">${trimmedLine.substring(2)}</h2>`;
+      htmlContent += `<h2 style="font-size: 17px; font-weight: bold; margin: 14px 0 10px 0; page-break-after: avoid; orphans: 3; widows: 3;">${trimmedLine.substring(2)}</h2>`;
       return;
     }
 
     if (trimmedLine.startsWith('- ') || trimmedLine.startsWith('* ')) {
       const text = trimmedLine.substring(2).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      htmlContent += `<p style="font-size: 11px; margin: 4px 0; padding-left: 20px; page-break-inside: avoid; orphans: 2; widows: 2;">• ${text}</p>`;
+      htmlContent += `<p style="font-size: 14px; margin: 4px 0; padding-left: 20px; page-break-inside: avoid; orphans: 2; widows: 2;">• ${text}</p>`;
       return;
     }
 
@@ -183,12 +185,12 @@ function createSingleRecipeHTML(recipe, mealTypeLabel) {
     if (numberedMatch) {
       const index = numberedMatch[1];
       const text = numberedMatch[2].replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      htmlContent += `<p style="font-size: 11px; margin: 4px 0; padding-left: 20px; page-break-inside: avoid; orphans: 2; widows: 2;">${index}. ${text}</p>`;
+      htmlContent += `<p style="font-size: 14px; margin: 4px 0; padding-left: 20px; page-break-inside: avoid; orphans: 2; widows: 2;">${index}. ${text}</p>`;
       return;
     }
 
     let processedLine = trimmedLine.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    htmlContent += `<p style="font-size: 11px; margin: 6px 0; line-height: 1.6; page-break-inside: avoid; orphans: 2; widows: 2;">${processedLine}</p>`;
+    htmlContent += `<p style="font-size: 14px; margin: 6px 0; line-height: 1.6; page-break-inside: avoid; orphans: 2; widows: 2;">${processedLine}</p>`;
   });
 
   const hasImage = recipe.photo && recipe.photo.trim() !== '';
@@ -196,18 +198,20 @@ function createSingleRecipeHTML(recipe, mealTypeLabel) {
   const W = PDF_CONTENT_WIDTH_PX;
   return `
     <div class="pdf-recipe-root" style="color: #000000; font-family: 'Times New Roman', Times, serif; background: white; width: ${W}px; max-width: ${W}px; box-sizing: border-box;">
+      <div class="pdf-recipe-meal-header" style="margin: 0 0 12px 0; padding-bottom: 8px; border-bottom: 2px solid #000000;">
+        <p style="font-size: 16px; font-weight: bold; margin: 0; color: #000000; word-wrap: break-word;">${mealTypeLabel}</p>
+      </div>
       <div class="pdf-recipe-title-row" style="display: flex; align-items: flex-start; margin-bottom: 16px; gap: 20px;">
         <div style="flex: 1; min-width: 0;">
-          <h1 style="font-size: 18px; font-weight: bold; margin: 0; color: #000000; word-wrap: break-word; overflow-wrap: break-word; line-height: 1.3;">${recipe.title}</h1>
+          <h1 style="font-size: 22px; font-weight: bold; margin: 0; color: #000000; word-wrap: break-word; overflow-wrap: break-word; line-height: 1.3;">${recipe.title}</h1>
         </div>
       </div>
-      <div class="pdf-recipe-meta" style="margin-bottom: 20px; color: #000000; font-size: 9px;">
-        <p style="margin: 4px 0;">Тип: ${mealTypeLabel}</p>
+      <div class="pdf-recipe-meta" style="margin-bottom: 20px; color: #000000; font-size: 11px;">
         <p style="margin: 4px 0;">Автор: ${recipe.author}</p>
       </div>
       <div class="pdf-recipe-body" style="margin-bottom: 20px;">
         ${hasImage ? 
-        `<div class="pdf-recipe-float-wrap" style="float: right; margin-left: 12px; margin-bottom: 10px; width: 150px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        `<div class="pdf-recipe-float-wrap" style="float: right; margin-left: 12px; margin-bottom: 10px; width: 200px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
           <img src="${recipeImage}" alt="${recipe.title}" style="width: 100%; height: auto; display: block;" />
         </div>`
         : ''}
@@ -216,19 +220,6 @@ function createSingleRecipeHTML(recipe, mealTypeLabel) {
         </div>
         <div style="clear: both;"></div>
       </div>
-    </div>
-  `;
-}
-
-/**
- * Create HTML content for chapter header (mealType)
- */
-function createChapterHTML(mealTypeLabel) {
-  const H = PDF_CONTENT_HEIGHT_PX;
-  const W = PDF_CONTENT_WIDTH_PX;
-  return `
-    <div style="font-family: 'Times New Roman', Times, serif; color: #000000; background: white; width: ${W}px; box-sizing: border-box; min-height: ${H}px; height: ${H}px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-      <h1 style="font-size: 26px; font-weight: bold; margin: 0; color: #000000; text-align: center; border-bottom: 3px solid #000000; word-wrap: break-word; white-space: normal; max-width: 100%;">${mealTypeLabel}</h1>
     </div>
   `;
 }
@@ -262,21 +253,21 @@ function createTOCHTML(recipePageMap, mealTypes) {
       if (currentMealType !== null) {
         tocHTML += '<div style="margin: 15px 0;"></div>'; // Spacing between mealType groups
       }
-      tocHTML += `<h3 style="font-size: 13px; font-weight: bold; margin: 20px 0 8px 0; color: #000000; border-top: 1px solid #e0e0e0;">${mealTypeLabel}</h3>`;
+      tocHTML += `<h3 style="font-size: 16px; font-weight: bold; margin: 20px 0 8px 0; color: #000000; border-top: 1px solid #e0e0e0;">${mealTypeLabel}</h3>`;
       currentMealType = recipe.mealType;
     }
     
-    tocHTML += `<p style="margin: 4px 0; padding-left: 20px; font-size: 10px; display: flex; align-items: flex-end; gap: 2px;">
+    tocHTML += `<p style="margin: 4px 0; padding-left: 20px; font-size: 12px; display: flex; align-items: flex-end; gap: 2px;">
       <span style="flex-shrink: 0;">${recipe.title}</span>
       <span style="flex: 1; border-bottom: 1px dotted #000000; height: 1px;"></span>
-      <span style="color: #000000; font-weight: normal; flex-shrink: 0; width: 10px; text-align: right;">${pageNumber}</span>
+      <span style="color: #000000; font-weight: normal; flex-shrink: 0; min-width: 14px; text-align: right;">${pageNumber}</span>
     </p>`;
   });
 
   const W = PDF_CONTENT_WIDTH_PX;
   return `
     <div class="pdf-toc-root" style="font-family: 'Times New Roman', Times, serif; color: #000000; background: white; width: ${W}px; max-width: ${W}px; box-sizing: border-box;">
-      <h2 style="font-size: 15px; font-weight: bold; margin: 20px 0 10px 0;">Съдържание</h2>
+      <h2 style="font-size: 18px; font-weight: bold; margin: 20px 0 10px 0;">Съдържание</h2>
       ${tocHTML}
     </div>
   `;
@@ -763,7 +754,7 @@ async function addFullBleedCoverPageToPDF(doc) {
 }
 
 /**
- * Generate PDF with all recipes - grouped by mealType with chapters and TOC with page numbers
+ * Generate PDF with all recipes - grouped by mealType (meal type on each recipe page) and TOC with page numbers
  * @param {object[]} recipes
  * @param {{ value: string, label: string }[]} mealTypes
  * @param {{ returnAs?: 'arraybuffer', saveFilename?: string }} [options] — use returnAs: 'arraybuffer' for programmatic export (e.g. CLI); default triggers browser download
@@ -815,87 +806,7 @@ export async function generateAllRecipesPDF(recipes, mealTypes, options = {}) {
 
   // Generate all content and track page numbers
   for (const mealType of sortedMealTypes) {
-    const mealTypeLabel = mealTypes.find(mt => mt.value === mealType)?.label || mealType;
     const mealTypeRecipes = recipesByMealType[mealType];
-
-    // Add chapter header
-    const chapterHTML = createChapterHTML(mealTypeLabel);
-    const chapterDiv = document.createElement('div');
-    chapterDiv.innerHTML = chapterHTML;
-    chapterDiv.style.position = 'fixed';
-    chapterDiv.style.top = '0';
-    chapterDiv.style.left = '0';
-    chapterDiv.style.width = `${PDF_CONTENT_WIDTH_PX}px`;
-    chapterDiv.style.maxWidth = `${PDF_CONTENT_WIDTH_PX}px`;
-    chapterDiv.style.background = 'white';
-    chapterDiv.style.zIndex = '-1';
-    document.body.appendChild(chapterDiv);
-
-    try {
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // For chapter pages, use the div directly without splitting (it's already centered and sized)
-      // Create a page div that preserves the chapter structure
-      const chapterPageDiv = document.createElement('div');
-      chapterPageDiv.innerHTML = chapterHTML;
-      const chapterInnerDiv = chapterPageDiv.querySelector('div');
-      if (chapterInnerDiv) {
-        // Preserve the original styling without adding padding
-        chapterPageDiv.style.width = `${PDF_CONTENT_WIDTH_PX}px`;
-        chapterPageDiv.style.background = 'white';
-        chapterPageDiv.style.boxSizing = 'border-box';
-        chapterPageDiv.style.padding = '0';
-        chapterPageDiv.style.margin = '0';
-      }
-      
-      const chapterPages = [chapterPageDiv];
-      
-      for (let i = 0; i < chapterPages.length; i++) {
-        const pageDiv = chapterPages[i];
-        pageDiv.style.position = 'fixed';
-        pageDiv.style.top = '0';
-        pageDiv.style.left = '0';
-        pageDiv.style.zIndex = '-1';
-        document.body.appendChild(pageDiv);
-        
-        try {
-          await waitForImages(pageDiv);
-          await new Promise(resolve => setTimeout(resolve, 100));
-
-          stretchPdfPageShellForCapture(pageDiv);
-          const capH = Math.max(pageDiv.scrollHeight, PDF_CONTENT_HEIGHT_PX);
-
-          const canvas = await html2canvas(pageDiv, {
-            scale: 3,
-            useCORS: true,
-            logging: false,
-            backgroundColor: '#ffffff',
-            width: PDF_CONTENT_WIDTH_PX,
-            height: capH,
-            windowWidth: PDF_CONTENT_WIDTH_PX,
-            windowHeight: capH,
-            letterRendering: true,
-            allowTaint: false,
-            removeContainer: false,
-            imageTimeout: 15000,
-            onclone: (clonedDoc) => {
-              const clonedBody = clonedDoc.body;
-              clonedBody.style.webkitFontSmoothing = 'antialiased';
-              clonedBody.style.mozOsxFontSmoothing = 'grayscale';
-              clonedBody.style.textRendering = 'optimizeLegibility';
-            }
-          });
-
-          const imgData = canvas.toDataURL('image/png');
-          contentPages.push({ imgData, pageNumber: currentPage, kind: 'chapter' });
-          currentPage++;
-        } finally {
-          document.body.removeChild(pageDiv);
-        }
-      }
-    } finally {
-      document.body.removeChild(chapterDiv);
-    }
 
     // Add recipes for this mealType
     for (let i = 0; i < mealTypeRecipes.length; i++) {
