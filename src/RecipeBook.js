@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, User, UtensilsCrossed, FileDown, ExternalLink } from 'lucide-react';
 import { parseRecipeMarkdown, filenameToSlug } from './utils/recipeParser';
-import { generateAllRecipesPDF } from './utils/pdfGenerator';
 import { recipeFiles } from './recipes/discovered';
 import { getMealTypesFromRecipes, getMealTypeLabel, getDefaultMealTypes, MEAL_TYPE_LABELS } from './utils/mealTypes';
 import { getRecipeImage } from './utils/recipeImage';
@@ -70,17 +69,20 @@ function RecipeBook() {
     }
   };
 
-  const handleDownloadAllPDF = async () => {
-    if (filteredRecipes.length === 0) {
+  const handleDownloadAllPDF = () => {
+    if (recipes.length === 0) {
       alert('Няма рецепти за изтегляне!');
       return;
     }
-    try {
-      await generateAllRecipesPDF(filteredRecipes, mealTypes);
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('Грешка при генериране на PDF файла. Моля, опитайте отново.');
-    }
+    const base = process.env.PUBLIC_URL || '';
+    const pathPrefix = base.endsWith('/') ? base.slice(0, -1) : base;
+    const link = document.createElement('a');
+    link.href = `${pathPrefix}/book.pdf`;
+    link.download = 'Успяваме-заедно-всички-рецепти.pdf';
+    link.rel = 'noopener';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const stripMarkdown = (text) => {
@@ -138,11 +140,11 @@ function RecipeBook() {
           </div>
         </div>
         <div className="recipe-book-actions">
-          {!loading && filteredRecipes.length > 0 && (
+          {!loading && recipes.length > 0 && (
             <button 
               className="btn-download-all"
               onClick={handleDownloadAllPDF}
-              title="Изтегли всички рецепти като PDF"
+              title="Изтегли готовата книга (PDF) от сайта"
             >
               <FileDown size={20} />
               Изтегли всички PDF

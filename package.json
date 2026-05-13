@@ -5,12 +5,17 @@
   "main": "index.js",
   "scripts": {
     "discover-recipes": "node scripts/discover-recipes.js",
+    "generate-book-pdf": "node scripts/generate-book-pdf.cjs",
     "prestart": "npm run discover-recipes",
     "prebuild": "npm run discover-recipes",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.2",
+    "puppeteer": "^24.15.0"
   },
   "dependencies": {
     "date-fns": "^2.30.0",
