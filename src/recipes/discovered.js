@@ -3,7 +3,8 @@
 // It lists all .md files found in public/recipes/
 
 export const recipeFiles = [
-  "template.md",
+  "Бананови-бонбони-с-кокос copy.md",
+  "Бананови-бонбони-с-кокос.md",
   "Бананови-палачинки.md",
   "Бананови-хапки-с-шоколад.md",
   "Бананово-брауни.md",
